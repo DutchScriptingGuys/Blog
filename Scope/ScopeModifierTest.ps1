@@ -1,0 +1,1 @@
+$Global:Message = "And now it is another message."
