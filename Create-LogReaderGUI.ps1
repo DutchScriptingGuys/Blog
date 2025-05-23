@@ -54,7 +54,7 @@ class ListLogItem {
         $this.FullName = $fullname
     }
 
-    # Override ToString to show only the UPN in the ListBox
+    # Override ToString to show the LastWriteTime and Name in the ListBox
     [string] ToString() {
         return "$($this.LastWriteTime) `t $($this.Name)"
     }
@@ -134,6 +134,9 @@ $label_timespan.Size = New-Object System.Drawing.Size(250, 20)
 
 # Create radio buttons for the timespan selection
 $index = 0
+$object_size_x = 250
+$object_size_y = 20
+
 @(
     "1 hour",
     "2 hours",
@@ -141,20 +144,27 @@ $index = 0
     "8 hours",
     "24 hours"
 ).ForEach({
-    $size_y = 20
-    $y = 160 + ($size_y * $index)
+    $y = 160 + ($object_size_y * $index)
+    $index++
+
     $radioButton = New-Object System.Windows.Forms.RadioButton
     $radioButton.Text = $_
     $radioButton.Location = New-Object System.Drawing.Point(20, $y)
-    $radioButton.Size = New-Object System.Drawing.Size(250, $size_y)
-    $radioButton.Name = "radioButton$($index+1)"
+    $radioButton.Size = New-Object System.Drawing.Size($object_size_x, $object_size_y)
+    $radioButton.Name = "radioButton$($index)"
     $form.Controls.Add($radioButton)
-    $index++
 })
 
 # Set the default radio button
 $form.Controls["radioButton1"].Checked = $true
 #endregion Timespan
+
+# Multiple selection listbox for the log files
+$ListBox_Log = New-Object System.Windows.Forms.ListBox
+$ListBox_Log.Location = New-Object System.Drawing.Point(280, 40)
+$ListBox_Log.Size = New-Object System.Drawing.Size(700, 330)
+$ListBox_Log.SelectionMode = [System.Windows.Forms.SelectionMode]::one
+$ListBox_Log.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Regular)
 
 # Create a button to get logs
 $button_get_log = New-Object System.Windows.Forms.Button
@@ -189,13 +199,6 @@ $button_get_log.Add_Click({
         $ListBox_Log.Items.Add([Activator]::CreateInstance([ListLogItem], @($($logFile.Name), $($logFile.FullName), $($logFile.LastWriteTime))))
     }
 })
-
-# Multiple selection listbox for the log files
-$ListBox_Log = New-Object System.Windows.Forms.ListBox
-$ListBox_Log.Location = New-Object System.Drawing.Point(280, 40)
-$ListBox_Log.Size = New-Object System.Drawing.Size(700, 330)
-$ListBox_Log.SelectionMode = [System.Windows.Forms.SelectionMode]::one
-$ListBox_Log.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Regular)
 
 # Create a new button to open the selected log file
 $button_open_log = New-Object System.Windows.Forms.Button
